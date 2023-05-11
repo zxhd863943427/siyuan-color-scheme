@@ -1,11 +1,11 @@
 {
-  "name": "plugin-sample",
-  "author": "Vanessa",
-  "url": "https://github.com/siyuan-note/plugin-sample",
+  "name": "siyuan-color-scheme",
+  "author": "zxhd963943427",
+  "url": "https://github.com/zxhd863943427/siyuan-color-scheme",
   "version": "0.0.1",
   "displayName": {
-    "default": "Plugin Sample",
-    "zh_CN": "插件示例"
+    "default": "color-scheme",
+    "zh_CN": "配色方案"
   },
   "description": {
     "default": "This is a plugin sample",
