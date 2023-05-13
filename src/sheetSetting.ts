@@ -63,7 +63,31 @@ export function getStyleByName(name: string, sheet:CSSStyleSheet){
     return cssDict
 }
 
-
+export function getColorByName(name: string, sheet:CSSStyleSheet){
+    //获取样式dict
+    let style = getStyleByName(name,sheet)
+    let color = ""
+    let styleName = ""
+    let re = /background/
+    //判断样式类型：color or background-color
+    if (re.exec(name)!=null){
+        styleName = "background-color"
+    }
+    else{
+        styleName = "color"
+    }
+    //在样式dict中读取，如果有则返回
+    color = style[styleName]
+    if (color!=null){
+        return color
+    }
+    // 否则在全局变量中搜索
+    re = /(font|pdf)-(\w+)/
+    let match = re.exec(name)
+    let varName = `--b3-${match[1]}-${match[2]}`
+    color = getValueFromRootByName(varName)
+    return color
+}
 
 export function searchSheet(sheet: CSSStyleSheet, re: RegExp) {
     let tempCssRules = sheet.cssRules
