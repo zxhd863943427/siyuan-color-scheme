@@ -35,7 +35,10 @@ function foreachDict(obj: any, func: Function) {
 const rootElement = document.querySelector(":root")
 const computedStyles = window.getComputedStyle(rootElement);
 export function getStyleByName(name: string) {
-    return computedStyles.getPropertyValue(name)
+    let re = /(font|pdf)-(\w+)/
+    let match = re.exec(name)
+    let styleName = `--b3-${match[1]}-${match[2]}`
+    return computedStyles.getPropertyValue(styleName)
 }
 
 
@@ -123,7 +126,7 @@ function genSelector(itemStr: string,mode:string) {
     return baseMode + DomStr
 }
 
-function domToItemStr(DomStr: string) {
+export function domToItemStr(DomStr: string) {
     let re = /var\(--b3-(font|pdf)-(\w+)\)/
     let match = re.exec(DomStr)
     if (match === null) {
