@@ -7,7 +7,10 @@ const customStyle = document.createElement('style')
 customStyle.id = "colorSchemeCustom"
 document.head.appendChild(lightStyle)
 document.head.appendChild(darkStyle)
-document.head.appendChild(customStyle)
 sheets["light"] =  lightStyle.sheet
 sheets["dark"] = darkStyle.sheet
-sheets["custom"] =  customStyle.sheet
+sheets["custom"] = ()=>{return customStyle.sheet}
+sheets["customInject"] = (Dom:HTMLElement)=>{
+    Dom.appendChild(customStyle)
+    return customStyle
+}
