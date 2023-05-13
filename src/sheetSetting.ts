@@ -42,7 +42,8 @@ export function getStyleByName(name: string, sheet:CSSStyleSheet){
     let re = /(font|pdf)-(\w+)/
     let match = re.exec(name)
     let styleName = `--b3-${match[1]}-${match[2]}`
-    let rule = searchSheet(sheet, new RegExp(styleName))
+    // fix 搜索 color1错误
+    let rule = searchSheet(sheet, new RegExp(styleName + "\\\)"))
     if (rule != null){
         return exportRule(rule)
     }
@@ -78,7 +79,8 @@ export function getColorByName(name: string, sheet:CSSStyleSheet){
     }
     //在样式dict中读取，如果有则返回
     color = style[styleName]
-    if (color!=null){
+    // fix return color:""
+    if (color !=null && color!=""){
         return color
     }
     // 否则在全局变量中搜索
@@ -155,7 +157,14 @@ function genSelector(itemStr: string,mode:string) {
     let fontColorRe = /font-color/
     let fontBackgroundRe = /font-background/
     let pdfBackgroundRe = /pdf-background/
-    let baseMode = `:root[data-theme-mode=\"${mode}\"] `
+    //fix shadow without data-theme-mode
+    let baseMode
+    if (mode!="none"){
+        baseMode = `:root[data-theme-mode=\"${mode}\"] `
+    }
+    else{
+        baseMode = ""
+    }
     if (fontColorRe.exec(itemStr)) {
         DomStr = `[style*="color"][style*="var(--b3-${itemStr})"]`
     }
