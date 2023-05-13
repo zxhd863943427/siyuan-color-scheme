@@ -30,7 +30,7 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
                 ${plugin.i18n.showText}
                 </span>
                 </div>
-                <div><textarea class="b3-text-field fn__block" >${JSON.stringify(cssDict,(any,item)=>{return item},"\n")}</textarea></div>
+                <div style="margin:10px 0px"><textarea class="b3-text-field fn__block" >${JSON.stringify(cssDict,(any,item)=>{return item},"\n")}</textarea></div>
                 <span class="pickrCheck"></span>
 
         
