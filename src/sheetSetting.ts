@@ -34,18 +34,39 @@ function foreachDict(obj: any, func: Function) {
 
 const rootElement = document.querySelector(":root")
 const computedStyles = window.getComputedStyle(rootElement);
-export function getStyleByName(name: string) {
+function getValueFromRootByName(name: string) {
+    return computedStyles.getPropertyValue(name)
+}
+
+export function getStyleByName(name: string, sheet:CSSStyleSheet){
     let re = /(font|pdf)-(\w+)/
     let match = re.exec(name)
     let styleName = `--b3-${match[1]}-${match[2]}`
-    return computedStyles.getPropertyValue(styleName)
+    let rule = searchSheet(sheet, new RegExp(styleName))
+    if (rule != null){
+        return exportRule(rule)
+    }
+    let cssDict:any = {}
+    let color = getValueFromRootByName(styleName)
+    let reColor = /color/
+    let reBackgroundColor = /background/
+    if (reColor.exec(name)){
+        cssDict["color"] = color
+    }
+    else if (reBackgroundColor.exec(name)){
+        cssDict['background-color'] = color
+    }
+    else{
+        console.log("getStyleByName 未能找到或解析", name)
+        return {}    
+    }
 }
 
 
 
 export function searchSheet(sheet: CSSStyleSheet, re: RegExp) {
     let tempCssRules = sheet.cssRules
-    let tempRule
+    let tempRule:any = null
     foreach(tempCssRules, (item: CSSStyleRule) => {
         let slector = item.selectorText
         if (re.exec(slector) != null) {
