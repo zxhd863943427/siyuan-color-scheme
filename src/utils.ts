@@ -1,14 +1,22 @@
 import Pickr from '@simonwep/pickr';
 import { pickrNanoCss } from "./assets/css"
+import { getColorByName, getStyleByName, exportSheet, importSheet } from "./sheetSetting"
+import { sheets } from "./initStyle"
+
 export function getMode(){
     return document.querySelector("html").getAttribute("data-theme-mode")
 }
 
-export function createPickr(element:HTMLElement, color:string) {
+export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
     const id = 'color-scheme-plugin'
-    let currentColor = color
+    let currentSheet = sheets[getMode()]
+    let currentColor = getColorByName(StyleName, currentSheet)
+    let cssDict = getStyleByName(StyleName,currentSheet)
+
+    currentColor = currentColor ? currentColor.trim() : null;
     console.log(currentColor)
     element.attachShadow({ mode: "open" });
+    
     element.shadowRoot.innerHTML = `
         <style>
         ${pickrNanoCss}
@@ -16,7 +24,13 @@ export function createPickr(element:HTMLElement, color:string) {
             border-radius: 4px;
         }
                 </style>
+                <div style="display:flex;align-items: center">
                 <span class="pickr"></span>
+                <span style="background-color:var(--b3-font-color27);margin:0px 4px;font-size:1.1em;">
+                ${plugin.i18n.showText}
+                </span>
+                </div>
+                <div><textarea class="b3-text-field fn__block" >${JSON.stringify(cssDict,(any,item)=>{return item},"\n")}</textarea></div>
                 <span class="pickrCheck"></span>
 
         
@@ -65,12 +79,11 @@ export function createPickr(element:HTMLElement, color:string) {
             }
         }
     });
-    let that = this;
     pickrInit.on("save", (color:any) => {
-        let colorValue = color ? color.toHEXA() : "";
+        let colorValue = color ? color.toHEXA().toString() : "";
 
         window.tempColor = color;
-        console.log(colorValue,color)
+        console.log(colorValue)
     });
-    return pickrInit;
+    return element.shadowRoot;
 }

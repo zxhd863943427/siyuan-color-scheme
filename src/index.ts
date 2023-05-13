@@ -1,5 +1,12 @@
-import {Plugin, showMessage, confirm, Dialog, Menu, isMobile, openTab} from "siyuan";
+import { Plugin, showMessage, confirm, Dialog, Menu, isMobile, openTab } from "siyuan";
 import "./index.scss";
+import "./color.scss";
+import { getColorByName, domToItemStr, getStyleByName, searchSheet, exportSheetText, exportSheet, importSheet } from "./sheetSetting"
+import { sheets } from "./initStyle"
+import { customSheet } from "./testStyle"
+import { getMode, createPickr } from "./utils"
+
+window.sheetSetting = [getStyleByName, searchSheet, exportSheetText, exportSheet, importSheet, customSheet, getColorByName,sheets]
 
 const STORAGE_NAME = "menu-config";
 const TAB_TYPE = "custom_tab";
@@ -9,7 +16,9 @@ export default class PluginSample extends Plugin {
     private customTab: () => any;
 
     onload() {
+        window.plugin = this
         console.log(this.i18n.helloPlugin);
+        this.addContext();
 
         this.eventBus.on("ws-main", this.wsEvent);
 
@@ -62,6 +71,49 @@ export default class PluginSample extends Plugin {
     private wsEvent({detail}: any) {
         console.log(detail);
     }
+
+    private async addContext() {
+        let that = this
+        document.addEventListener("contextmenu", function (event) {
+            var target: any = event.target;
+            if (target.className === "color__square") {
+                let currentSheet = sheets[getMode()]
+                // 确定字体颜色还是背景
+                let colorStyle = target.style.cssText
+                let StyleName = domToItemStr(colorStyle)
+                console.log(StyleName)
+                const menu = document.createElement('div')
+
+                // 注入自定义样式
+                let cssDict = getStyleByName(StyleName,currentSheet)
+                let sheetDict = {"font-color27":cssDict}
+                console.log(sheetDict)
+                let pickrRoot = createPickr(menu, StyleName, that)
+                let cumstomSheet = sheets["customInject"](pickrRoot)
+                
+                console.log(menu)
+                let menuObj = new Menu('ColorSchemePlugin')
+                let html = menuObj.addItem({ id:"pickrMenu" })
+                let container = html.parentElement
+                container.innerHTML = ""
+                container.append(menu)
+                
+                if (isMobile()) {
+                    menuObj.fullscreen();
+                } else {
+                    menuObj.open({
+                        x: event.clientX,
+                        y: event.clientY,
+                        isLeft: true,
+                    });
+                }
+
+                
+                importSheet(cumstomSheet.sheet,sheetDict,"none")
+            }
+        })
+    }
+    
 
     private async addMenu(rect: DOMRect) {
         if (!this.data) {
