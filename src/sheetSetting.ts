@@ -60,6 +60,7 @@ export function getStyleByName(name: string, sheet:CSSStyleSheet){
         console.log("getStyleByName 未能找到或解析", name)
         return {}    
     }
+    return cssDict
 }
 
 
