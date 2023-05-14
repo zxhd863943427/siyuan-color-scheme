@@ -83,6 +83,7 @@ export default class PluginSample extends Plugin {
                 let StyleName = domToItemStr(colorStyle)
                 console.log(StyleName)
                 const menu = document.createElement('div')
+                menu.id = "pickrMenuItem"
 
                 // 注入自定义样式
                 let cssDict = getStyleByName(StyleName,currentSheet)
