@@ -1,0 +1,18 @@
+[style*="color:var(--b3-font-color"] {
+    /* 略微调高字重 */
+    font-size: 1em;
+    /* 如果你想让标注了的文字的字号有变化的话，可以修改数值 */
+    opacity: 100% !important;
+    /* 不透明度 */
+    vertical-align: inherit;
+    text-shadow: none !important;
+    /* 无文字阴影！ */
+
+}
+
+.color__square{
+    /* 修改字色菜单中的图标颜色 */
+    /* 不显示那个A字 */
+    font-weight: 900;
+    // color: transparent !important;
+}
