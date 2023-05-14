@@ -1,12 +1,11 @@
 import { Plugin, showMessage, confirm, Dialog, Menu, isMobile, openTab } from "siyuan";
 import "./index.scss";
 import "./color.scss";
-import { getColorByName, domToItemStr, getStyleByName, searchSheet, exportSheetText, exportSheet, importSheet } from "./sheetSetting"
+import {  domToItemStr, getStyleByName, searchSheet, exportSheet, importSheet } from "./sheetSetting"
 import { sheets } from "./initStyle"
 import { customSheet } from "./testStyle"
 import { getMode, createPickr } from "./utils"
 
-window.sheetSetting = [getStyleByName, searchSheet, exportSheetText, exportSheet, importSheet, customSheet, getColorByName,sheets]
 
 const STORAGE_NAME = "menu-config";
 const TAB_TYPE = "custom_tab";
