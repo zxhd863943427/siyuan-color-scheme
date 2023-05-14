@@ -8,11 +8,15 @@
   "showText": "饮水思源",
   "testScheme": "测试",
   "parseError": "解析高级设置失败",
-  "exportCss": "导出当前css",
   "openSetting": "打开设置",
   "choseLightScheme": "选择日间配色方案",
   "lightScheme": "切换当前的日间文字配色方案",
   "choseDarkScheme": "选择夜晚配色方案",
   "darkScheme": "切换当前的夜晚文字配色方案",
-  "uploadScheme": "上传配色方案"
+  "uploadScheme": "上传配色方案",
+  "exportCurrentCss": "导出当前 CSS",
+  "exportCurrentScheme": "导出配色方案",
+  "exportCssSuccess": "导出 CSS 成功！请查看 data\\storage\\petal\\siyuan-color-scheme 目录下的 export.css",
+  "exportSchemeSuccess": "导出当前配色方案成功！请查看 data\\storage\\petal\\siyuan-color-scheme 目录下的 export.json",
+  "resetScheme":"恢复系统默认"
 }

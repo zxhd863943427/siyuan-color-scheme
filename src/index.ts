@@ -1,7 +1,7 @@
 import { Plugin, showMessage, confirm, Dialog, Menu, isMobile, openTab } from "siyuan";
 import "./index.scss";
 import "./color.scss";
-import {  domToItemStr, getStyleByName, searchSheet, exportSheet, importSheet } from "./sheetSetting"
+import {  domToItemStr, getStyleByName, exportSheetText, exportSheet, importSheet } from "./sheetSetting"
 import { sheets } from "./initStyle"
 import { customSheet } from "./testStyle"
 import { getMode, createPickr } from "./utils"
@@ -112,7 +112,7 @@ export default class PluginSample extends Plugin {
             const selected = target.value;
             this.applyScheme(selected,"light");
         });
-        const selectDark:HTMLSelectElement = dialog.element.querySelector('#light-schemes-current');
+        const selectDark:HTMLSelectElement = dialog.element.querySelector('#dark-schemes-current');
         selectDark.value = this.config.currentDark;
         selectDark.addEventListener('change', (e) => {
             let target:any =  e.target
@@ -220,7 +220,7 @@ export default class PluginSample extends Plugin {
     }
 
     async applyScheme(selected:string,mode:string){
-        // console.log(selected)
+        console.log(selected)
         // 如果是default就清空当前设置
         if (selected == "default"){
             switch(mode){
@@ -332,25 +332,42 @@ export default class PluginSample extends Plugin {
             console.log(this.i18n.byeMenu);
         });
         menu.addItem({
-            label: "confirm",
-            click() {
-                confirm("Confirm", "Is this a confirm?", () => {
-                    showMessage("confirm");
-                }, () => {
-                    showMessage("cancel");
-                });
+            label: this.i18n.exportCurrentScheme,
+            click: ()=>{
+                let light = exportSheet(sheets["light"])
+                let dark = exportSheet(sheets["dark"])
+                let exportData = {
+                    name:"export",
+                    light:light,
+                    dark:dark
+                }
+                this.saveData("export.json",JSON.stringify(exportData,(any,item)=>{return item},"\t"))
+                showMessage(this.i18n.exportSchemeSuccess)
             }
         });
         menu.addItem({
-            label: "save",
+            label: this.i18n.exportCurrentCss,
             click: () => {
-                this.saveCustomData();
+                let lightCss = exportSheetText(sheets["light"])
+                let darkCss = exportSheetText(sheets["dark"])
+                let allCss = `           
+/* light scheme */
+${lightCss}
+/* light scheme */
+
+
+/* dark scheme */
+${darkCss}
+/* dark scheme */
+                `
+                this.saveData("export.css",allCss)
+                showMessage(this.i18n.exportCssSuccess)
             }
         });
         menu.addItem({
-            label: "load",
+            label: this.i18n.resetScheme,
             click: () => {
-                this.loadCustomData();
+                this.applyScheme("default",getMode());
             }
         });
         menu.addItem({
@@ -358,42 +375,6 @@ export default class PluginSample extends Plugin {
             click: () => {
                 this.openSetting()
             }
-        });
-        menu.addItem({
-            label: "Dialog",
-            click: () => {
-                new Dialog({
-                    title: "Info",
-                    content: '<div class="b3-dialog__content">This is a dialog</div>',
-                    width: isMobile() ? "92vw" : "520px",
-                });
-            }
-        });
-        menu.addItem({
-            label: "open Tab",
-            click: () => {
-                openTab({
-                    custom: {
-                        icon: "iconEmoji",
-                        title: "Custom Tab",
-                        data: {
-                            text: "This is my custom tab",
-                        },
-                        fn: this.customTab
-                    },
-                });
-            }
-        });
-        menu.addItem({
-            label: "off ws-main",
-            click: () => {
-                this.eventBus.off("ws-main", this.wsEvent);
-            }
-        });
-        menu.addSeparator();
-        menu.addItem({
-            label: this.data[STORAGE_NAME] || "readonly",
-            type: "readonly",
         });
         if (isMobile()) {
             menu.fullscreen();
