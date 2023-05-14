@@ -3,7 +3,6 @@ import "./index.scss";
 import "./color.scss";
 import {  domToItemStr, getStyleByName, exportSheetText, exportSheet, importSheet } from "./sheetSetting"
 import { sheets } from "./initStyle"
-import { customSheet } from "./testStyle"
 import { getMode, createPickr } from "./utils"
 
 
@@ -31,7 +30,6 @@ export default class PluginSample extends Plugin {
     config = defaultConfig;
 
     onload() {
-        window.plugin = this
         console.log(this.i18n.helloPlugin);
         this.addContext();
         this.loadConfig();
