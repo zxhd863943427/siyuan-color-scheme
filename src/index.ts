@@ -11,14 +11,32 @@ window.sheetSetting = [getStyleByName, searchSheet, exportSheetText, exportSheet
 const STORAGE_NAME = "menu-config";
 const TAB_TYPE = "custom_tab";
 
+interface MyObject {
+    [key: string]: string;
+}
+const defaultConfig = {
+    colorSchemeStyleId: 'color-scheme-plugin',
+    currentLight: 'default',
+    currentDark: 'default',
+    lightSchemes: {
+        'default': '系统默认',
+    },
+    darkSchemes: {
+        'default': '系统默认',
+    },
+}
+
 export default class PluginSample extends Plugin {
 
     private customTab: () => any;
+    config = defaultConfig;
 
     onload() {
         window.plugin = this
         console.log(this.i18n.helloPlugin);
         this.addContext();
+        this.loadConfig();
+        this.loadCustomData();
 
         this.eventBus.on("ws-main", this.wsEvent);
 
@@ -44,28 +62,94 @@ export default class PluginSample extends Plugin {
     }
 
     openSetting() {
+        const lightSchemes :MyObject = this.config.lightSchemes
+        const lightOptions:Array<string> = Object.keys(this.config.lightSchemes);
+
+        const darkSchemes :MyObject = this.config.darkSchemes
+        const darkOptions:Array<string> = Object.keys(this.config.darkSchemes);
         const dialog = new Dialog({
             title: this.name,
-            content: `<div class="b3-dialog__content"><textarea class="b3-text-field fn__block" placeholder="readonly text in the menu"></textarea></div>
-<div class="b3-dialog__action">
-    <button class="b3-button b3-button--cancel">${this.i18n.cancel}</button><div class="fn__space"></div>
-    <button class="b3-button b3-button--text">${this.i18n.save}</button>
-</div>`,
+            content: `<div class="config__tab-container" data-name="common" style="height: unset !important;">
+            <label class="fn__flex b3-label config__item">
+                <div class="fn__flex-1">
+                    ${this.i18n.choseLightScheme}
+                    <div class="b3-label__text">${this.i18n.lightScheme}</div>
+                </div> 
+                <span class="fn__space"></span>
+                <select class="b3-select fn__flex-center fn__size200" id="light-schemes-current">
+                    ${lightOptions.map((o) => `<option value="${o}">${lightSchemes[o]}</option>`).join('\n')}
+                </select>
+            </label>
+            <label class="fn__flex b3-label config__item">
+                <div class="fn__flex-1">
+                    ${this.i18n.choseDarkScheme}
+                    <div class="b3-label__text">${this.i18n.darkScheme}</div>
+                </div> 
+                <span class="fn__space"></span>
+                <select class="b3-select fn__flex-center fn__size200" id="dark-schemes-current">
+                    ${darkOptions.map((o) => `<option value="${o}">${darkSchemes[o]}</option>`).join('\n')}
+                </select>
+            </label>
+            <label class="fn__flex b3-label config__item">
+                <div class="fn__flex-1">
+                    上传配色方案
+                    <div class="b3-label__text">导入社区提供的配色方案</div>
+                </div>
+                <span class="fn__space"></span>
+                <button class="b3-button b3-button--outline fn__flex-center fn__size200" id="color-schemes-upload-button">
+                    点击上传
+                    <input class="b3-file fn__flex-center" type="file" id="color-schemes-file" style="display:none"/>
+                    </button>
+            </label>
+        </div>`,
             width: isMobile() ? "92vw" : "520px",
         });
-        const inputElement = dialog.element.querySelector("textarea");
-        const btnsElement = dialog.element.querySelectorAll(".b3-button");
-        dialog.bindInput(inputElement, () => {
-            (btnsElement[1] as HTMLButtonElement).click();
+        const uploadButton = dialog.element.querySelector('#color-schemes-upload-button');
+
+        const selectLight:HTMLSelectElement = dialog.element.querySelector('#light-schemes-current');
+        selectLight.value = this.config.currentLight;
+        selectLight.addEventListener('change', (e) => {
+            let target:any =  e.target
+            const selected = target.value;
+            this.applyScheme(selected,"light");
         });
-        inputElement.focus();
-        btnsElement[0].addEventListener("click", () => {
-            dialog.destroy();
+        const selectDark:HTMLSelectElement = dialog.element.querySelector('#light-schemes-current');
+        selectDark.value = this.config.currentDark;
+        selectDark.addEventListener('change', (e) => {
+            let target:any =  e.target
+            const selected = target.value;
+            this.applyScheme(selected,"dark");
         });
-        btnsElement[1].addEventListener("click", () => {
-            this.saveData(STORAGE_NAME, inputElement.value);
-            dialog.destroy();
+
+        const file:HTMLInputElement = dialog.element.querySelector('#color-schemes-file');
+        uploadButton.addEventListener('click', () => {
+            file.click();
         });
+        file.addEventListener('change', async (e) => {
+            console.log("file.change")
+            let fileElement:HTMLInputElement = dialog.element.querySelector('#color-schemes-file');
+            let file = fileElement.files[0];
+            await this.upload(file);
+
+            // this.updateSelect();
+        });
+    }
+
+    private async updateSelect() {
+        let newOptionsHTML;
+        // light
+        const lightSelect = document.querySelector('#light-schemes-current');
+        const lightSchemes: MyObject = this.config.lightSchemes;
+        const lightOptions: Array<string> = Object.keys(this.config.lightSchemes);
+        newOptionsHTML = lightOptions.map((o) => `<option value="${o}">${lightSchemes[o]}</option>`).join('\n');
+        lightSelect.innerHTML = newOptionsHTML;
+
+        //dark
+        const darkSelect = document.querySelector('#dark-schemes-current');
+        const darkSchemes: MyObject = this.config.darkSchemes;
+        const darkOptions: Array<string> = Object.keys(this.config.darkSchemes);
+        newOptionsHTML = darkOptions.map((o) => `<option value="${o}">${darkSchemes[o]}</option>`).join('\n');
+        darkSelect.innerHTML = newOptionsHTML;
     }
 
     private wsEvent({detail}: any) {
@@ -115,6 +199,130 @@ export default class PluginSample extends Plugin {
         })
     }
     
+    async saveCustomData(){
+        let light = exportSheet(sheets["light"])
+        let dark = exportSheet(sheets["dark"])
+        let CustomData = {
+            name:"custom",
+            light:light,
+            dark:dark
+        }
+        this.saveData("custom.json",JSON.stringify(CustomData,(any,item)=>{return item},"\t"))
+    }
+
+    async loadCustomData(){
+        let CustomData = await this.loadData("custom.json")
+        if (CustomData === "" || CustomData === undefined || CustomData === null){
+            this.saveCustomData()
+            return
+        }
+        importSheet(sheets["light"],CustomData["light"])
+        importSheet(sheets["dark"],CustomData["dark"])
+    }
+
+    async applyScheme(selected:string,mode:string){
+        // console.log(selected)
+        // 如果是default就清空当前设置
+        if (selected == "default"){
+            switch(mode){
+                case "light":
+                    importSheet(sheets["light"],{});
+                    this.config["currentLight"] = selected;
+                    break;
+                case "dark":
+                    importSheet(sheets["dark"],{});
+                    this.config["currentDark"] = selected;
+                    break;
+            }
+            this.saveCustomData()
+            this.saveConfig()
+            return
+        }
+        let CustomData = await this.loadData(`${selected}.json`)
+        
+        switch(mode){
+            case "light":
+                importSheet(sheets["light"],CustomData["light"]);
+                this.config["currentLight"] = selected;
+                break;
+            case "dark":
+                importSheet(sheets["dark"],CustomData["dark"]);
+                this.config["currentDark"] = selected;
+                break;
+        }
+        this.saveConfig()
+        this.saveCustomData()
+        return
+    }
+    async upload(file:any) {
+        return new Promise<void>((resolve) => {
+            let reader = new FileReader();
+            reader.addEventListener('load', async (e) => {
+                console.log("start load file")
+                let text:any = e.target.result;
+                let scheme;
+                try {
+                    scheme = JSON.parse(text);
+                } catch (e) {
+                    // new Notification({ type: 'error', message: 'Scheme parse failed' }).show();
+                    showMessage("Scheme parse failed",6000,'error');
+                    return;
+                }
+                const name = scheme.name;
+                if (!name) {
+                    // new Notification({ type: 'error', message: '配色方案无名称' }).show();
+                    showMessage("配色方案无名称",6000,'error');
+                    return;
+                }
+                if (name === 'config') {
+                    // new Notification({ type: 'error', message: '配色方案名称不能叫config' }).show();
+                    showMessage("配色方案名称不能叫config",6000,'error');
+                    return;
+                }
+                if(scheme.light === undefined && scheme.dark === undefined){
+                    showMessage("配色方案格式不正确，缺乏 light、dark字段",6000,'error');
+                    return
+                }
+                this.saveData(`${name}.json`,JSON.stringify(scheme,(any,item)=>{return item},"\t"))
+                // this.saveScheme(name, schemes);
+                // new Notification({ type: 'info', message: `配色方案${name}上传成功` }).show();
+                showMessage(`配色方案${name}上传成功`,6000,'info');
+                await this.updateConfig(scheme)
+                // if (name === this.config.current) {
+                //     this.applyScheme(name);
+                // }
+            });
+            reader.readAsText(file);
+            resolve();
+        });
+
+    }
+
+    async updateConfig(scheme:any){
+        let name:string = scheme.name
+        if (scheme["light"]!=undefined){
+            // const lightSchemes :MyObject = this.config.lightSchemes
+            this.config.lightSchemes[name] = name
+        }
+        if (scheme["light"]!=undefined){
+            // const darkSchemes :MyObject = this.config.darkSchemes
+            this.config.lightSchemes[name] = name
+        }
+        this.updateSelect();
+        this.saveConfig();
+    }
+
+    private saveConfig(){
+        this.saveData("config.json",JSON.stringify(this.config,(any,item)=>{return item},"\t"))
+    }
+    private async loadConfig(){
+        let config = await this.loadData("config.json")
+        if (config === null || config === "" || config === undefined){
+            this.saveConfig()
+            return
+        }
+        this.config = config;
+    }
 
     private async addMenu(rect: DOMRect) {
         if (!this.data) {
@@ -135,9 +343,21 @@ export default class PluginSample extends Plugin {
             }
         });
         menu.addItem({
-            label: "showMessage",
+            label: "save",
             click: () => {
-                showMessage(this.i18n.helloPlugin);
+                this.saveCustomData();
+            }
+        });
+        menu.addItem({
+            label: "load",
+            click: () => {
+                this.loadCustomData();
+            }
+        });
+        menu.addItem({
+            label: this.i18n.openSetting,
+            click: () => {
+                this.openSetting()
             }
         });
         menu.addItem({

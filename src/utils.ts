@@ -33,11 +33,11 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
                 </div>
                 <div style="display:none" id="pickrMasterMode">
                     <div style="margin:10px 0px">
-                        <textarea class="b3-text-field fn__block" id="pickrTextarea">${JSON.stringify(cssDict,(any,item)=>{return item},"\n")}</textarea>
+                        <textarea class="b3-text-field fn__block" id="pickrTextarea">${JSON.stringify(cssDict,(any,item)=>{return item},"\t")}</textarea>
                     </div>
                     <div class="b3-dialog__action" style="display:flex;">
                         <button class="b3-button b3-button--cancel" id="pickrCancel">${plugin.i18n.cancel}</button>
-
+                        <button class="b3-button b3-button--text" id="pickrTestScheme">${plugin.i18n.testScheme}</button>
                         <button class="b3-button b3-button--text" id="pickrSave">${plugin.i18n.save}</button>
                     </div>
                 </div>
@@ -92,11 +92,24 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
     pickrInit.on("save", (color:any) => {
         let colorValue = color ? color.toHEXA().toString() : "";
         console.log(colorValue)
-        updateColor(StyleName,colorValue)
+        updateColor(StyleName,colorValue,plugin)
     });
     element.shadowRoot.getElementById("pickrShowText").addEventListener("click",()=>{
         element.shadowRoot.getElementById("pickrMasterMode").style.cssText=""
         element.shadowRoot.getElementById("pickrCancel").addEventListener("click",destory)
+        element.shadowRoot.getElementById("pickrTestScheme").addEventListener("click",(ev)=>{
+            let target:any = ev.target
+            console.log(target)
+            let root = target.getRootNode()
+            let value = root.getElementById("pickrTextarea").value
+            try{
+                value = JSON.parse(value)
+                testSheet(StyleName,value)
+            }
+            catch{
+                showMessage(plugin.i18n.parseError)
+            }
+        })
         element.shadowRoot.getElementById("pickrSave").addEventListener("click",(ev)=>{
             let target:any = ev.target
             console.log(target)
@@ -104,7 +117,7 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
             let value = root.getElementById("pickrTextarea").value
             try{
                 value = JSON.parse(value)
-                updateSheet(StyleName,value)
+                updateSheet(StyleName,value,plugin)
             }
             catch{
                 showMessage(plugin.i18n.parseError)
@@ -118,7 +131,7 @@ function destory(){
     document.getElementById("pickrMenuItem").remove()
 }
 
-function updateColor(styleName:string,color:string){
+function updateColor(styleName:string,color:string,plugin:any){
     let styleVar = getStyleVar(styleName)
     let currentSheet = sheets[getMode()]
     let cssDict = getStyleByName(styleName,currentSheet)
@@ -130,9 +143,10 @@ function updateColor(styleName:string,color:string){
     //更新预览css
     sheetDict = {"font-color27":cssDict}
     importSheet(sheets['custom'](),sheetDict,"none")
+    plugin.saveCustomData()
 }
 
-function updateSheet(styleName:string,cssDict:any){
+function updateSheet(styleName:string,cssDict:any,plugin:any){
 
     let currentSheet = sheets[getMode()]
     let sheetDict = exportSheet(currentSheet)
@@ -141,5 +155,13 @@ function updateSheet(styleName:string,cssDict:any){
     importSheet(currentSheet,sheetDict,getMode())
     //更新预览css
     sheetDict = {"font-color27":cssDict}
+    importSheet(sheets['custom'](),sheetDict,"none")
+    plugin.saveCustomData()
+}
+
+function testSheet(styleName:string,cssDict:any){
+
+    //更新预览css
+    let sheetDict = {"font-color27":cssDict}
     importSheet(sheets['custom'](),sheetDict,"none")
 }

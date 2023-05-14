@@ -5,5 +5,7 @@
   "byeMenu": "Bye, Menu!",
   "helloPlugin": "Hello, Plugin!",
   "byePlugin": "Bye, Plugin!",
-  "showText": "Beautiful SiYuan"
+  "showText": "Beautiful SiYuan",
+  "testScheme": "test scheme",
+  "parseError": "Parsing advanced settings failed"
 }

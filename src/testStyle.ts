@@ -216,6 +216,6 @@ customStyle.innerHTML = `
     margin-top: 6px;
 }
 `
-
+customStyle.innerHTML = ""
 document.head.appendChild(customStyle)
 export const customSheet = customStyle.sheet

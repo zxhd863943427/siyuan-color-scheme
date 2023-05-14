@@ -5,5 +5,14 @@
   "byeMenu": "再见，菜单！",
   "helloPlugin": "你好，插件！",
   "byePlugin": "再见，插件！",
-  "showText": "饮水思源"
+  "showText": "饮水思源",
+  "testScheme": "测试",
+  "parseError": "解析高级设置失败",
+  "exportCss": "导出当前css",
+  "openSetting": "打开设置",
+  "choseLightScheme": "选择日间配色方案",
+  "lightScheme": "切换当前的日间文字配色方案",
+  "choseDarkScheme": "选择夜晚配色方案",
+  "darkScheme": "切换当前的夜晚文字配色方案",
+  "uploadScheme": "上传配色方案"
 }
