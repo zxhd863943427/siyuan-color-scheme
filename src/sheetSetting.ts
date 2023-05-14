@@ -38,19 +38,7 @@ function getValueFromRootByName(name: string) {
     return computedStyles.getPropertyValue(name)
 }
 
-export function getStyleByName(name: string, sheet:CSSStyleSheet){
-    console.log("start getStyleByName",name)
-    let re = /(font|pdf)-(\w+)/
-    let match = re.exec(name)
-    let styleName = `--b3-${match[1]}-${match[2]}`
-    // fix 搜索 color1错误
-    let rule = searchSheet(sheet, new RegExp(styleName + "\\\)"))
-    let cssDict:any = {}
-    if (rule != null){
-        cssDict = exportRule(rule)
-    }
-
-    // 判断 name 的css类型
+export function getStyleVar(name:string){
     let styleVar = ""
     let reColor = /color/
     let reBackgroundColor = /background/
@@ -64,8 +52,25 @@ export function getStyleByName(name: string, sheet:CSSStyleSheet){
     }
     else{
         console.log("getStyleByName 未能找到或解析", name)
-        return {}    
+        return ""    
     }
+    return styleVar
+}
+
+export function getStyleByName(name: string, sheet:CSSStyleSheet){
+    console.log("start getStyleByName",name)
+    let re = /(font|pdf)-(\w+)/
+    let match = re.exec(name)
+    let styleName = `--b3-${match[1]}-${match[2]}`
+    // fix 搜索 color1错误
+    let rule = searchSheet(sheet, new RegExp(styleName + "\\\)"))
+    let cssDict:any = {}
+    if (rule != null){
+        cssDict = exportRule(rule)
+    }
+
+    // 判断 name 的css类型
+    let styleVar = getStyleVar(name)
 
     // 判断是否需要注入
     let color = getValueFromRootByName(styleName)
