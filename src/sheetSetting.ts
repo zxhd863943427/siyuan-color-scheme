@@ -58,7 +58,7 @@ export function getStyleVar(name:string){
 }
 
 export function getStyleByName(name: string, sheet:CSSStyleSheet){
-    console.log("start getStyleByName",name)
+    // console.log("start getStyleByName",name)
     let re = /(font|pdf)-(\w+)/
     let match = re.exec(name)
     let styleName = `--b3-${match[1]}-${match[2]}`

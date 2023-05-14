@@ -15,7 +15,7 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
     let cssDict = getStyleByName(StyleName,currentSheet)
 
     currentColor = currentColor ? currentColor.trim() : null;
-    console.log(currentColor)
+    // console.log(currentColor)
     element.attachShadow({ mode: "open" });
     
     element.shadowRoot.innerHTML = `
@@ -91,7 +91,7 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
     });
     pickrInit.on("save", (color:any) => {
         let colorValue = color ? color.toHEXA().toString() : "";
-        console.log(colorValue)
+        // console.log(colorValue)
         updateColor(StyleName,colorValue,plugin)
     });
     element.shadowRoot.getElementById("pickrShowText").addEventListener("click",()=>{
@@ -99,7 +99,7 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
         element.shadowRoot.getElementById("pickrCancel").addEventListener("click",destory)
         element.shadowRoot.getElementById("pickrTestScheme").addEventListener("click",(ev)=>{
             let target:any = ev.target
-            console.log(target)
+            // console.log(target)
             let root = target.getRootNode()
             let value = root.getElementById("pickrTextarea").value
             try{
@@ -112,7 +112,7 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
         })
         element.shadowRoot.getElementById("pickrSave").addEventListener("click",(ev)=>{
             let target:any = ev.target
-            console.log(target)
+            // console.log(target)
             let root = target.getRootNode()
             let value = root.getElementById("pickrTextarea").value
             try{

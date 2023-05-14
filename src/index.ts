@@ -125,7 +125,7 @@ export default class PluginSample extends Plugin {
             file.click();
         });
         file.addEventListener('change', async (e) => {
-            console.log("file.change")
+            // console.log("file change")
             let fileElement:HTMLInputElement = dialog.element.querySelector('#color-schemes-file');
             let file = fileElement.files[0];
             await this.upload(file);
@@ -164,18 +164,18 @@ export default class PluginSample extends Plugin {
                 // 确定字体颜色还是背景
                 let colorStyle = target.style.cssText
                 let StyleName = domToItemStr(colorStyle)
-                console.log(StyleName)
+                // console.log(StyleName)
                 const menu = document.createElement('div')
                 menu.id = "pickrMenuItem"
 
                 // 注入自定义样式
                 let cssDict = getStyleByName(StyleName,currentSheet)
                 let sheetDict = {"font-color27":cssDict}
-                console.log(sheetDict)
+                // console.log(sheetDict)
                 let pickrRoot = createPickr(menu, StyleName, that)
                 let cumstomSheet = sheets["customInject"](pickrRoot)
                 
-                console.log(menu)
+                // console.log(menu)
                 let menuObj = new Menu('ColorSchemePlugin')
                 let html = menuObj.addItem({ id:"pickrMenu" })
                 let container = html.parentElement
@@ -257,7 +257,7 @@ export default class PluginSample extends Plugin {
         return new Promise<void>((resolve) => {
             let reader = new FileReader();
             reader.addEventListener('load', async (e) => {
-                console.log("start load file")
+                // console.log("start load file")
                 let text:any = e.target.result;
                 let scheme;
                 try {
