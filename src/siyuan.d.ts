@@ -1,159 +1,179 @@
-declare module "siyuan" {
-    type TEventBus = "ws-main"
+declare module "siyuan"{
+type TEventBus = "ws-main"
 
-    interface IObject {
-        [key: string]: string;
-    }
+interface IObject {
+    [key: string]: string;
+}
 
-    interface IWebSocketData {
-        cmd: string
-        callback?: string
-        data: any
-        msg: string
-        code: number
-        sid: string
-    }
+interface IWebSocketData {
+    cmd: string
+    callback?: string
+    data: any
+    msg: string
+    code: number
+    sid: string
+}
 
-    interface IMenuItemOption {
-        label?: string,
-        click?: (element: HTMLElement) => void,
-        type?: "separator" | "submenu" | "readonly",
-        accelerator?: string,
-        action?: string,
-        id?: string,
-        submenu?: IMenuItemOption[]
-        disabled?: boolean
-        icon?: string
-        iconHTML?: string
-        current?: boolean
-        bind?: (element: HTMLElement) => void
-    }
+interface IPluginDockTab {
+    position: "LeftTop" | "LeftBottom" | "RightTop" | "RightBottom" | "BottomLeft" | "BottomRight",
+    size: { width: number, height: number },
+    icon: string,
+    hotkey?: string,
+    title: string,
+}
 
-    export function fetchPost(url: string, data?: any, cb?: (response: IWebSocketData) => void, headers?: IObject): void;
+interface IMenuItemOption {
+    label?: string,
+    click?: (element: HTMLElement) => void,
+    type?: "separator" | "submenu" | "readonly",
+    accelerator?: string,
+    action?: string,
+    id?: string,
+    submenu?: IMenuItemOption[]
+    disabled?: boolean
+    icon?: string
+    iconHTML?: string
+    current?: boolean
+    bind?: (element: HTMLElement) => void
+}
 
-    export function fetchSyncPost(url: string, data?: any): Promise<IWebSocketData>;
+export function fetchPost(url: string, data?: any, cb?: (response: IWebSocketData) => void, headers?: IObject): void;
 
-    export function fetchGet(url: string, cb: (response: IWebSocketData) => void): void;
+export function fetchSyncPost(url: string, data?: any): Promise<IWebSocketData>;
 
-    export function openTab(options: {
-        custom?: {
-            title: string,
-            icon: string,
-            data?: any
-            fn?: () => any,
-        }   // card 和自定义页签 必填
-        position?: "right" | "bottom",
-        keepCursor?: boolean // 是否跳转到新 tab 上
-        removeCurrentTab?: boolean // 在当前页签打开时需移除原有页签
-        afterOpen?: () => void // 打开后回调
-    }): void
+export function fetchGet(url: string, cb: (response: IWebSocketData) => void): void;
 
-    export function isMobile(): boolean;
+export function openTab(options: {
+    custom?: {
+        title: string,
+        icon: string,
+        data?: any
+        fn?: () => any,
+    }   // card 和自定义页签 必填
+    position?: "right" | "bottom",
+    keepCursor?: boolean // 是否跳转到新 tab 上
+    removeCurrentTab?: boolean // 在当前页签打开时需移除原有页签
+    afterOpen?: () => void // 打开后回调
+}): void
 
-    export function confirm(title: string, text: string, confirmCB?: () => void, cancelCB?: () => void): void;
+export function isMobile(): boolean;
 
-    /**
-     * @param timeout - ms. 0: manual close；-1: always show; 6000: default
-     * @param {string} [type=info]
+export function adaptHotkey(hotkey: string): string;
+
+export function confirm(title: string, text: string, confirmCB?: () => void, cancelCB?: () => void): void;
+
+/**
+ * @param timeout - ms. 0: manual close；-1: always show; 6000: default
+ * @param {string} [type=info]
+ */
+export function showMessage(text: string, timeout?: number, type?: "info" | "error", id?: string): void;
+
+export class App {
+    plugins: Plugin[];
+}
+
+export abstract class Plugin {
+    eventBus: EventBus;
+    i18n: IObject;
+    data: any;
+    name: string;
+
+    constructor(options: {
+        app: App,
+        id: string,
+        name: string,
+        i18n: IObject
+    })
+
+    onload(): void;
+
+    onunload(): void;
+
+    /*
+     * @param {string} [options.position=right]
      */
-    export function showMessage(text: string, timeout?: number, type?: "info" | "error", id?: string): void;
+    addTopBar(options: {
+        icon: string,
+        title: string,
+        callback: (evt: MouseEvent) => void
+        position?: "right" | "left"
+    }): HTMLDivElement;
 
-    export class App {
-        plugins: Plugin[];
-    }
+    openSetting(): void
 
-    export abstract class Plugin {
-        eventBus: EventBus;
-        i18n: IObject;
-        data: any;
-        name: string;
+    // registerCommand(command: IPluginCommand): void;
 
-        constructor(options: {
-            app: App,
-            id: string,
-            name: string,
-            i18n: IObject
-        })
+    // registerSettingRender(settingRender: SettingRender): void;
 
-        onload(): void;
+    loadData(storageName: string): Promise<any>;
 
-        onunload(): void;
+    saveData(storageName: string, content: any): Promise<void>;
 
-        /*
-         * @param {string} [options.position=right]
-         */
-        addTopBar(options: {
-            icon: string,
-            title: string,
-            callback: (evt: MouseEvent) => void
-            position?: "right" | "left"
-        }): HTMLDivElement;
+    addTab(options: {
+        type: string,
+        destroy?: () => void,
+        resize?: () => void,
+        update?: () => void,
+        init: () => void
+    }): () => any
 
-        openSetting(): void
+    addDock(options: {
+        config: IPluginDockTab,
+        data: any,
+        type: string,
+        destroy?: () => void,
+        resize?: () => void,
+        update?: () => void,
+        init: () => void
+    }): any
+}
 
-        // registerCommand(command: IPluginCommand): void;
+export class EventBus {
+    on(type: TEventBus, listener: (event: CustomEvent<any>) => void): void;
 
-        // registerSettingRender(settingRender: SettingRender): void;
+    once(type: TEventBus, listener: (event: CustomEvent<any>) => void): void;
 
-        loadData(storageName: string): Promise<any>;
+    off(type: TEventBus, listener: (event: CustomEvent<any>) => void): void;
 
-        saveData(storageName: string, content: any): Promise<void>;
+    emit(type: TEventBus, detail?: any): boolean;
+}
 
-        createTab(options: {
-            type: string,
-            destroy?: () => void,
-            resize?: () => void,
-            update?: () => void,
-            init: () => void
-        }): () => any
-    }
+export class Dialog {
 
-    export class EventBus {
-        on(type: TEventBus, listener: (event: CustomEvent<any>) => void): void;
+    element: HTMLElement;
 
-        once(type: TEventBus, listener: (event: CustomEvent<any>) => void): void;
+    constructor(options: {
+        title?: string,
+        transparent?: boolean,
+        content: string,
+        width?: string
+        height?: string,
+        destroyCallback?: (options?: IObject) => void
+        disableClose?: boolean
+        disableAnimation?: boolean
+    });
 
-        off(type: TEventBus, listener: (event: CustomEvent<any>) => void): void;
+    destroy(options?: IObject): void;
 
-        emit(type: TEventBus, detail?: any): boolean;
-    }
+    bindInput(inputElement: HTMLInputElement | HTMLTextAreaElement, enterEvent?: () => void): void;
+}
 
-    export class Dialog {
+export class Menu {
+    constructor(id?: string, closeCB?: () => void);
 
-        element: HTMLElement;
+    showSubMenu(subMenuElement: HTMLElement): void;
 
-        constructor(options: {
-            title?: string,
-            transparent?: boolean,
-            content: string,
-            width?: string
-            height?: string,
-            destroyCallback?: (options?: IObject) => void
-            disableClose?: boolean
-            disableAnimation?: boolean
-        });
+    addItem(options: IMenuItemOption): HTMLElement;
 
-        destroy(options?: IObject): void;
+    addSeparator(): void;
 
-        bindInput(inputElement: HTMLInputElement | HTMLTextAreaElement, enterEvent?: () => void): void;
-    }
+    open(options: { x: number, y: number, h?: number, w?: number, isLeft?: boolean }): void;
 
-    export class Menu {
-        constructor(id?: string, closeCB?: () => void);
+    /*
+     * @param {string} [position=all]
+     */
+    fullscreen(position?: "bottom" | "all"): void;
 
-        showSubMenu(subMenuElement: HTMLElement): void;
-
-        addItem(options: IMenuItemOption): HTMLElement;
-
-        addSeparator(): void;
-
-        open(options: { x: number, y: number, h?: number, w?: number, isLeft?: boolean }): void;
-
-        /*
-         * @param {string} [position=all]
-         */
-        fullscreen(position?: "bottom" | "all"): void;
-
-        close(): void;
-    }
+    close(): void;
+}
 }

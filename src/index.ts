@@ -7,7 +7,6 @@ import { getMode, createPickr } from "./utils"
 
 
 const STORAGE_NAME = "menu-config";
-const TAB_TYPE = "custom_tab";
 
 interface MyObject {
     [key: string]: string;
@@ -24,9 +23,8 @@ const defaultConfig = {
     },
 }
 
-export default class PluginSample extends Plugin {
+export default class PluginColorScheme extends Plugin {
 
-    private customTab: () => any;
     config = defaultConfig;
 
     onload() {
@@ -35,7 +33,6 @@ export default class PluginSample extends Plugin {
         this.loadConfig();
         this.loadCustomData();
 
-        this.eventBus.on("ws-main", this.wsEvent);
 
         const topBarElement = this.addTopBar({
             icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"><path d="M19.2277 18.7321L20.9955 16.9644L22.7632 18.7321C23.7395 19.7084 23.7395 21.2914 22.7632 22.2677C21.7869 23.244 20.204 23.244 19.2277 22.2677C18.2514 21.2914 18.2514 19.7084 19.2277 18.7321ZM8.87861 1.07959L20.1923 12.3933C20.5828 12.7838 20.5828 13.417 20.1923 13.8075L11.707 22.2928C11.3165 22.6833 10.6833 22.6833 10.2928 22.2928L1.80754 13.8075C1.41702 13.417 1.41702 12.7838 1.80754 12.3933L9.58572 4.61512L7.4644 2.4938L8.87861 1.07959ZM10.9999 6.02934L3.92886 13.1004L10.9999 20.1715L18.071 13.1004L10.9999 6.02934Z"></path></svg>`,
@@ -46,12 +43,6 @@ export default class PluginSample extends Plugin {
             }
         });
 
-        this.customTab = this.createTab({
-            type: TAB_TYPE,
-            init() {
-                this.element.innerHTML = `<div class="plugin-sample__custom-tab">${this.data.text}</div>`;
-            }
-        });
     }
 
     onunload() {
@@ -149,9 +140,6 @@ export default class PluginSample extends Plugin {
         darkSelect.innerHTML = newOptionsHTML;
     }
 
-    private wsEvent({detail}: any) {
-        console.log(detail);
-    }
 
     private async addContext() {
         let that = this
