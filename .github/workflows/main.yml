@@ -28,11 +28,45 @@ jobs:
           changelog-types: '[{"type":"feat","section":"Features","hidden":false},{"type":"fix","section":"Bug Fixes","hidden":false},{"type":"refactor","section":"Code Refactoring","hidden":false},{"type":"chore","section":"Miscellaneous","hidden":false},{"type":"perf","section":"Performance Improvements","hidden":false}]'
 
       # Checkout
-      - uses: actions/checkout@master
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install dependencies and build for production
+        run: |
+          pnpm install
+          pnpm run build
+        
+        
+        
       - name: Archive Release
         uses: thedoctor0/zip-release@0.7.1
         with:
           type: 'zip'
+          directory: './dist'
           filename: 'package.zip'
           exclusions: '*.git* /*node_modules/* .editorconfig'
 
@@ -44,5 +78,5 @@ jobs:
           artifactErrorsFailBuild: true
           removeArtifacts: false
           replacesArtifacts: false
-          artifacts: "package.zip"
+          artifacts: "dist/package.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
