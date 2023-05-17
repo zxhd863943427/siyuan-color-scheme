@@ -49,6 +49,18 @@ export default class PluginColorScheme extends Plugin {
         console.log(this.i18n.byePlugin);
     }
 
+    saveData(storageName: string, content: any): Promise<void> {
+        return super.saveData(storageName+".txt",content)
+    }
+
+    async loadData(storageName: string): Promise<any> {
+        let tempStr = await super.loadData(storageName +".txt")
+        if (tempStr === null || tempStr === "" || tempStr === undefined){
+            return ""
+        }
+        return JSON.parse(tempStr)
+    }
+
     openSetting() {
         const lightSchemes :MyObject = this.config.lightSchemes
         const lightOptions:Array<string> = Object.keys(this.config.lightSchemes);
@@ -327,7 +339,7 @@ export default class PluginColorScheme extends Plugin {
                     light:light,
                     dark:dark
                 }
-                this.saveData("export.json",JSON.stringify(exportData,(any,item)=>{return item},"\t"))
+                super.saveData("export.json",JSON.stringify(exportData,(any,item)=>{return item},"\t"))
                 showMessage(this.i18n.exportSchemeSuccess)
             }
         });
@@ -346,7 +358,7 @@ ${lightCss}
 ${darkCss}
 /* dark scheme */
                 `
-                this.saveData("export.css",allCss)
+                super.saveData("export.css",allCss)
                 showMessage(this.i18n.exportCssSuccess)
             }
         });
