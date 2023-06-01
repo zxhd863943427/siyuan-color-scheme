@@ -2,7 +2,8 @@
   "name": "siyuan-color-scheme",
   "author": "zxhd963943427",
   "url": "https://github.com/zxhd863943427/siyuan-color-scheme",
-  "version": "1.0.5",
+  "version": "1.0.6",
+  "minAppVersion": "2.8.10",
   "displayName": {
     "default": "color-scheme",
     "zh_CN": "配色方案"
