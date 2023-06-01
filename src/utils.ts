@@ -1,6 +1,6 @@
 import Pickr from '@simonwep/pickr';
 import { pickrNanoCss } from "./assets/css"
-import { showMessage } from "siyuan";
+import { showMessage, getFrontend } from "siyuan";
 import { getColorByName, getStyleByName, getStyleVar, exportSheet, importSheet } from "./sheetSetting"
 import { sheets } from "./initStyle"
 
@@ -165,3 +165,6 @@ function testSheet(styleName:string,cssDict:any){
     let sheetDict = {"font-color27":cssDict}
     importSheet(sheets['custom'](),sheetDict,"none")
 }
+
+const frontEnd = getFrontend();
+export const isMobile = (frontEnd === "mobile" || frontEnd === "browser-mobile")
