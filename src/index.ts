@@ -1,9 +1,9 @@
-import { Plugin, showMessage, confirm, Dialog, Menu, isMobile, openTab } from "siyuan";
+import { Plugin, showMessage, confirm, Dialog, Menu, openTab } from "siyuan";
 import "./index.scss";
 import "./color.scss";
 import {  domToItemStr, getStyleByName, exportSheetText, exportSheet, importSheet } from "./sheetSetting"
 import { sheets } from "./initStyle"
-import { getMode, createPickr } from "./utils"
+import { getMode, createPickr, isMobile } from "./utils"
 
 
 const STORAGE_NAME = "menu-config";
@@ -102,7 +102,7 @@ export default class PluginColorScheme extends Plugin {
                     </button>
             </label>
         </div>`,
-            width: isMobile() ? "92vw" : "520px",
+            width: isMobile ? "92vw" : "520px",
         });
         const uploadButton = dialog.element.querySelector('#color-schemes-upload-button');
 
@@ -180,7 +180,7 @@ export default class PluginColorScheme extends Plugin {
                 container.innerHTML = ""
                 container.append(menu)
                 
-                if (isMobile()) {
+                if (isMobile) {
                     menuObj.fullscreen();
                 } else {
                     menuObj.open({
@@ -374,7 +374,7 @@ ${darkCss}
                 this.openSetting()
             }
         });
-        if (isMobile()) {
+        if (isMobile) {
             menu.fullscreen();
         } else {
             menu.open({
