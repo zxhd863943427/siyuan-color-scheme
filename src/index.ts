@@ -213,8 +213,8 @@ export default class PluginColorScheme extends Plugin {
             this.saveCustomData()
             return
         }
-        importSheet(sheets["light"],CustomData["light"])
-        importSheet(sheets["dark"],CustomData["dark"])
+        importSheet(sheets["light"],CustomData["light"],"light")
+        importSheet(sheets["dark"],CustomData["dark"],"dark")
     }
 
     async applyScheme(selected:string,mode:string){
@@ -239,11 +239,11 @@ export default class PluginColorScheme extends Plugin {
         
         switch(mode){
             case "light":
-                importSheet(sheets["light"],CustomData["light"]);
+                importSheet(sheets["light"],CustomData["light"],"light");
                 this.config["currentLight"] = selected;
                 break;
             case "dark":
-                importSheet(sheets["dark"],CustomData["dark"]);
+                importSheet(sheets["dark"],CustomData["dark"],"dark");
                 this.config["currentDark"] = selected;
                 break;
         }
@@ -301,9 +301,9 @@ export default class PluginColorScheme extends Plugin {
             // const lightSchemes :MyObject = this.config.lightSchemes
             this.config.lightSchemes[name] = name
         }
-        if (scheme["light"]!=undefined){
+        if (scheme["dark"]!=undefined){
             // const darkSchemes :MyObject = this.config.darkSchemes
-            this.config.lightSchemes[name] = name
+            this.config.darkSchemes[name] = name
         }
         this.updateSelect();
         this.saveConfig();
