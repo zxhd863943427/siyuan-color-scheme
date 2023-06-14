@@ -80,6 +80,32 @@ export function getStyleByName(name: string, sheet:CSSStyleSheet){
     return cssDict
 }
 
+export function getCssTextByName(name: string, sheet:CSSStyleSheet){
+    // console.log("start getStyleByName",name)
+    let re = /(font|pdf)-(\w+)/
+    let match = re.exec(name)
+    let styleName = `--b3-${match[1]}-${match[2]}`
+    // fix 搜索 color1错误
+    let rule = searchSheet(sheet, new RegExp(styleName + "\\\)"))
+    let cssDict:any = {}
+    let cssText = ""
+    if (rule != null){
+        cssDict = exportRule(rule)
+        cssText = cssRuleToStr(rule)
+    }
+
+    // 判断 name 的css类型
+    let styleVar = getStyleVar(name)
+
+    // 判断是否需要注入
+    let color = getValueFromRootByName(styleName)
+    if (cssDict[styleVar] === undefined || cssDict[styleVar]===""){
+        cssText += `\n${styleVar}:${color};`
+        // cssDict[styleVar] = color
+    }
+    return cssText
+}
+
 export function getColorByName(name: string, sheet:CSSStyleSheet){
     //获取样式dict
     let style = getStyleByName(name,sheet)
@@ -230,6 +256,28 @@ export function importSheet(sheet: CSSStyleSheet, sheetDict: any, mode = "light"
         sheet.insertRule(cssStr, 0)
     })
     return sheet
+}
+
+export function cssRuleToStr(cssRule:CSSRule) {
+    let re =  /:root\[.+?\].+?\{(.+?)\}/
+    let parse = /(.+?):(.+?;)/g
+    let cssText = cssRule.cssText
+    let cssContent = cssText.match(re)[1]
+    let cssStr = cssContent.match(parse)
+    return cssStr.join("\n").replaceAll(" !important","")
+}
+
+export function strToCssRuleJson(str:string) {
+    let parse = /(?<name>.+?):(?<value>.+?);/g
+    let cssRuleList = str.matchAll(parse)
+    let jsonList = []
+    for (let css of cssRuleList){
+        let {name,value} = css.groups
+        jsonList.push(`"${name.trim()}":"${value.replace("!important","").trim()}"`)
+        // console.log(css)
+    }
+
+    return "{\n"+jsonList.join(",\n")+"\n}"
 }
 
 // 测试函数

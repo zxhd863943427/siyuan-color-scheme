@@ -1,7 +1,7 @@
 import Pickr from '@simonwep/pickr';
 import { pickrNanoCss } from "./assets/css"
 import { showMessage, getFrontend } from "siyuan";
-import { getColorByName, getStyleByName, getStyleVar, exportSheet, importSheet } from "./sheetSetting"
+import { getColorByName, getStyleByName, getStyleVar, exportSheet, importSheet, getCssTextByName, strToCssRuleJson } from "./sheetSetting"
 import { sheets } from "./initStyle"
 
 export function getMode(){
@@ -12,7 +12,7 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
     const id = 'color-scheme-plugin'
     let currentSheet = sheets[getMode()]
     let currentColor = getColorByName(StyleName, currentSheet)
-    let cssDict = getStyleByName(StyleName,currentSheet)
+    let cssText = getCssTextByName(StyleName,currentSheet)
 
     currentColor = currentColor ? currentColor.trim() : null;
     // console.log(currentColor)
@@ -33,7 +33,7 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
                 </div>
                 <div style="display:none" id="pickrMasterMode">
                     <div style="margin:10px 0px">
-                        <textarea class="b3-text-field fn__block" id="pickrTextarea">${JSON.stringify(cssDict,(any,item)=>{return item},"\t")}</textarea>
+                        <textarea class="b3-text-field fn__block" id="pickrTextarea">${cssText}</textarea>
                     </div>
                     <div class="b3-dialog__action" style="display:flex;">
                         <button class="b3-button b3-button--cancel" id="pickrCancel">${plugin.i18n.cancel}</button>
@@ -101,7 +101,8 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
             let target:any = ev.target
             // console.log(target)
             let root = target.getRootNode()
-            let value = root.getElementById("pickrTextarea").value
+            let rawValue = root.getElementById("pickrTextarea").value
+            let value = strToCssRuleJson(rawValue)
             try{
                 value = JSON.parse(value)
                 testSheet(StyleName,value)
@@ -114,7 +115,8 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
             let target:any = ev.target
             // console.log(target)
             let root = target.getRootNode()
-            let value = root.getElementById("pickrTextarea").value
+            let rawValue = root.getElementById("pickrTextarea").value
+            let value = strToCssRuleJson(rawValue)
             try{
                 value = JSON.parse(value)
                 updateSheet(StyleName,value,plugin)
