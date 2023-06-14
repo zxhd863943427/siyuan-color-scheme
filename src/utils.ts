@@ -32,8 +32,11 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
                     </span>
                 </div>
                 <div style="display:none" id="pickrMasterMode">
-                    <div style="margin:10px 0px">
-                        <textarea class="b3-text-field fn__block" id="pickrTextarea">${cssText}</textarea>
+                    <div style="margin:10px 0px;">
+                        <textarea 
+                            style=" width: 98%; min-height: 100px;" 
+                            class="b3-text-field fn__block" 
+                            id="pickrTextarea">${cssText}</textarea>
                     </div>
                     <div class="b3-dialog__action" style="display:flex;">
                         <button class="b3-button b3-button--cancel" id="pickrCancel">${plugin.i18n.cancel}</button>
@@ -95,6 +98,7 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
         updateColor(StyleName,colorValue,plugin)
     });
     element.shadowRoot.getElementById("pickrShowText").addEventListener("click",()=>{
+        element.parentElement.parentElement.style.minWidth="calc(min(100% , 400px))"
         element.shadowRoot.getElementById("pickrMasterMode").style.cssText=""
         element.shadowRoot.getElementById("pickrCancel").addEventListener("click",destory)
         element.shadowRoot.getElementById("pickrTestScheme").addEventListener("click",(ev)=>{
