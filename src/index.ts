@@ -58,6 +58,10 @@ export default class PluginColorScheme extends Plugin {
         if (tempStr === null || tempStr === "" || tempStr === undefined){
             return ""
         }
+        // 适配移动端自动解析txt
+        if ((typeof tempStr) === "object"){
+            return tempStr
+        }
         return JSON.parse(tempStr)
     }
 
