@@ -34,6 +34,7 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
                 <div style="display:none" id="pickrMasterMode">
                     <div style="margin:10px 0px;">
                         <textarea 
+                            spellcheck= "false"
                             style=" width: 98%; min-height: 100px;" 
                             class="b3-text-field fn__block" 
                             id="pickrTextarea">${cssText}</textarea>
@@ -98,7 +99,8 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
         updateColor(StyleName,colorValue,plugin)
     });
     element.shadowRoot.getElementById("pickrShowText").addEventListener("click",()=>{
-        element.parentElement.parentElement.style.minWidth="calc(min(100% , 400px))"
+        let min_width = isMobile ? "100%" : "400px";
+        element.parentElement.parentElement.style.minWidth = min_width
         element.shadowRoot.getElementById("pickrMasterMode").style.cssText=""
         element.shadowRoot.getElementById("pickrCancel").addEventListener("click",destory)
         element.shadowRoot.getElementById("pickrTestScheme").addEventListener("click",(ev)=>{
@@ -135,6 +137,7 @@ export function createPickr(element:HTMLElement, StyleName:string, plugin:any) {
 
 function destory(){
     document.getElementById("pickrMenuItem").remove()
+    document.getElementById("commonMenu").style.cssText = ""
 }
 
 function updateColor(styleName:string,color:string,plugin:any){
