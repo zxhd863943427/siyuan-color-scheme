@@ -264,6 +264,9 @@ export function cssRuleToStr(cssRule:CSSRule) {
     let cssText = cssRule.cssText
     let cssContent = cssText.match(re)[1]
     let cssStr = cssContent.match(parse)
+    if (!cssStr){
+        return ""
+    }
     return cssStr.join("\n").replaceAll(" !important","")
 }
 
