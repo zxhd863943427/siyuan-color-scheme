@@ -255,7 +255,23 @@ export function importSheet(sheet: CSSStyleSheet, sheetDict: any, mode = "light"
         let cssStr = cssDictToStr(value, item, mode)
         sheet.insertRule(cssStr, 0)
     })
+    syncExportStyle(sheet)
     return sheet
+}
+
+function syncExportStyle(sheet: CSSStyleSheet) {
+    const cssText = exportSheetText(sheet)
+    const pairs: Array<[string, string]> = [
+        ["colorSchemeLight", "snippetCSS-colorSchemeLight"],
+        ["colorSchemeDark", "snippetCSS-colorSchemeDark"],
+    ]
+    pairs.forEach(([srcId, dstId]) => {
+        const src = document.getElementById(srcId) as HTMLStyleElement | null
+        if (src && src.sheet === sheet) {
+            const dst = document.getElementById(dstId) as HTMLStyleElement
+            dst.textContent = cssText
+        }
+    })
 }
 
 export function cssRuleToStr(cssRule:CSSRule) {
